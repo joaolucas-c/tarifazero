@@ -1,0 +1,35 @@
+---
+title: "Tarifa Zerp"
+author: "João Lucas"
+date: "2024-07-11"
+output: ioslides_presentation
+---
+
+Gráfico de estimativa intervalar das médias de competição política entre municípios que adotaram e que não adotaram Tarifa Zero no transporte público
+
+```{r rodando pacotes}
+pacman::p_load("tidyverse","readxl","dplyr","tidyverse","ggplot2")
+```
+
+```{r atribuindo banco de dados}
+dados <- read_excel("banco.xlsx")
+```
+```{r, echo=FALSE}
+summary_data <- dados %>%
+  group_by(adotatz) %>%
+  summarize(
+    mean_competicao = mean(CompetiçãoPolítica, na.rm = TRUE),
+    ci_lower = mean(CompetiçãoPolítica, na.rm = TRUE) - qt(0.975, df=n()-1) * sd(CompetiçãoPolítica, na.rm = TRUE)/sqrt(n()),
+    ci_upper = mean(CompetiçãoPolítica, na.rm = TRUE) + qt(0.975, df=n()-1) * sd(CompetiçãoPolítica, na.rm = TRUE)/sqrt(n())
+  )
+
+
+ggplot(summary_data, aes(x = adotatz, y = mean_competicao)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(title = "Estimativas Intervalares da Competição Política por Adotatz",
+       x = "Adoção Tarifa Zero",
+       y = "Média da Competição Política")
+```
+Hipótese: Os municípios que adotaram a Tarifa Zero apresentam maior competição política
+
