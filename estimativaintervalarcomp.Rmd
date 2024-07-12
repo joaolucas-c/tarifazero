@@ -9,14 +9,14 @@ output:
 
 Gráfico de estimativa intervalar das médias de competição política entre municípios que adotaram e que não adotaram Tarifa Zero no transporte público
 
-```{r rodando pacotes, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r rodando pacotes, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 pacman::p_load("tidyverse","readxl","dplyr","tidyverse","ggplot2")
 ```
 
 ```{r atribuindo banco de dados, message=FALSE, warning=FALSE, paged.print=FALSE}
 dados <- read_excel("banco.xlsx")
 ```
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 summary_data <- dados %>%
   group_by(adotatz) %>%
   summarize(
