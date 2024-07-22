@@ -4,7 +4,7 @@ author: "João Lucas"
 date: "`r Sys.Date()`"
 output: 
   html_document:
-    self_contained: false
+    self_contained: TRUE
 ---
 
 ## Introdução
