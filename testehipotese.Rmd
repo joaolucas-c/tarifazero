@@ -34,7 +34,7 @@ t_test_result
 
 ## Gráficos
 
-```{r Gráficos, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r Gráficos, echo=FALSE, message=FALSE, warning=FALSE}
 # Boxplot da CompetiçãoPolítica por adotatz
 boxplot <- ggplot(banco, aes(x = factor(adotatz), y = CompetiçãoPolítica)) +
   geom_boxplot() +
