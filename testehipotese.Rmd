@@ -1,0 +1,59 @@
+---
+title: "Teste de Hipótese (T de Student)"
+author: "João Lucas"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    self_contained: false
+---
+
+## Introdução
+
+Neste relatório, será testada a hipótese de que a média de Competição Política entre os municípios que adotaram a política de Tarifa Zero no transporte público é significativamente maior do que a dos municípios que não adotaram a política.
+
+Nesse sentido, a hipótese nula será a de que não existe significância estatística na diferença entre essas médias.
+
+
+## Motivação
+
+Escolhemos o teste t de Student porque ele é apropriado para comparar as médias de duas amostras independentes. Suas potencialidades incluem a simplicidade e a eficácia em detectar diferenças entre médias. As limitações incluem a sensibilidade a desvios dessas suposições.
+
+## Execução do teste
+
+```{r T de Student, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(dplyr)
+library(ggplot2)
+library(readxl)
+
+banco <- read_excel("banco.xlsx")
+
+t_test_result <- t.test(CompetiçãoPolítica ~ adotatz, data = banco)
+
+t_test_result
+```
+
+## Gráficos
+
+```{r Gráficos, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Boxplot da CompetiçãoPolítica por adotatz
+boxplot <- ggplot(banco, aes(x = factor(adotatz), y = CompetiçãoPolítica)) +
+  geom_boxplot() +
+  labs(x = "Adoção TZ", y = "Competição Política", title = "Boxplot da Competição Política por Adoção TZ") +
+  theme_minimal()
+
+# Gráfico de densidade da CompetiçãoPolítica por adotatz
+densidade <- ggplot(banco, aes(x = CompetiçãoPolítica, fill = factor(adotatz))) +
+  geom_density(alpha = 0.5) +
+  labs(x = "Competição Política", y = "Densidade", fill = "Adoção TZ", title = "Densidade da Competição Política por Adoção TZ") +
+  theme_minimal()
+
+# Mostrar os gráficos
+print(boxplot)
+print(densidade)
+```
+
+## Conclusão
+
+O teste t mostra uma diferença estatisticamente significativa entre os grupos. Com um valor-p de 0.005136, rejeitamos a hipótese nula de que não há diferença nas médias de CompetiçãoPolítica entre os grupos que adotaram e não adotaram a política.
+
+A diferença média na CompetiçãoPolítica entre os grupos é negativa, indicando que o grupo que não adotou a política tem uma média de CompetiçãoPolítica menor em comparação com o grupo que adotou a política.
