@@ -1,0 +1,110 @@
+---
+title: "Tarifa Zero no Brasil"
+author: "Aline Maria e João Lucas"
+output:
+  slidy_presentation: default
+  beamer_presentation: default
+  ioslides_presentation: default
+---
+# Objeto: Tarifa Zero no Brasil
+
+No Brasil, o sistema de transporte coletivo urbano é um serviço público, sendo comumente operado por empresas privadas a partir de concessões ou permissões, municipais ou distritais (Schiaffino; Toledo; Ribeiro, 2015). Dessa forma, apesar do governo gerir esse serviço, o seu funcionamento está suscetível às demandas e interesses de grandes empresários do transporte. Sendo assim, o valor das tarifas a ser pago pelo próprio usuário tende a ser, muitas vezes, insustentável para uma parcela significativa das pessoas que dependem desse serviço para se locomover (de Carvalho, 2011). 
+  A implementação da Tarifa Zero universal nos transportes coletivos tem sido proposta como uma possível solução para a promoção do direito à cidade, como uma forma de mitigar as desigualdades características do contexto urbano capitalista. Partidos, ativistas, movimentos sociais e pesquisadores do tema reivindicam a luta pela Tarifa Zero enquanto política de promoção não só do direito à cidade, mas também de alternativas ecológicas e mais saudáveis de funcionamento da mobilidade urbana em geral. 
+  Hoje, estima-se que mais de 110 cidades adotam essa política, e a discussão sobre as condições para a sua implementação tem ganhado destaque no debate público. Dentre as regiões, a sudeste é a que mais demonstra adesão em relação à tarifa zero no transporte público.
+ 
+
+# Objetivos
+  Essa pesquisa tem como objetivo geral estabelecer um panorama sobre a difusão da implementação da Tarifa Zero nos sistemas de transporte público dos municípios brasileiros. Além disso, também serão analisadas a correlação entre as variáveis Competição Política e PIB per capita com a adoção dessa política. 
+  Nesse sentido, testamos as seguintes hipóteses:
+- Municípios com alta competitividade política (relacionado às eleições do executivo municipal) estão mais propensos à adoção devido à pressão para se diferenciar dos outros candidatos.
+- Municípios com alto PIB per capita estão mais propensos à adoção, pois essa medida é utilizada como um proxy de desenvolvimento econômico do município. 
+
+
+# Justificativa
+  É evidente a relevância do transporte público no funcionamento das cidades e na vida de seus habitantes, sendo um serviço essencial para a garantia de uma cidadania plena à medida que o acesso à mobilidade urbana interfere no acesso a outros direitos e serviços. Nesse sentido, impossibilitar a utilização do serviço de transporte público por meio da cobrança de tarifas diretas incompatíveis com a renda de determinados grupos sociais significa reproduzir segregações socioespaciais e intensificar as distintas formas de desigualdade que perpassam o contexto urbano. Assim, a pauta da Tarifa Zero possui grande importância social, de modo que a sua implementação pode trazer benefícios coletivos que vão além do impacto direto na vida dos usuários, influenciando na redução de congestionamentos e de poluição, por exemplo (Santini, 2023).
+  Como já apresentado, segundo a base de dados de Daniel Santini, cerca de 58% dos municípios brasileiros que adotam sistemas de gratuidade universal no transporte coletivo o fizeram a partir de 2020, abrangendo cidades de diferentes tamanhos e localizadas em todas as 5 regiões do Brasil. Segundo Santarém (2023), essa pauta já ganhou centralidade na política institucional de grandes capitais do país e recebeu relativa atenção nacional, não só pelo seu benefício social e ambiental, mas também em virtude da crise de financiamento do transporte público que atinge parte significativa dos municípios (intensificada pela redução de passageiros graças à pandemia de COVID-19).
+  Isso posto, é de grande relevância estabelecer um panorama que analise o histórico de implementação dessa política e que entenda se determinadas características (competição política e PIB per capita) são relevantes nesse processo.
+
+
+# Método
+  Para a realização desse trabalho, foram utilizados os dados compilados por Daniel Santini (2024), referentes aos municípios que adotam a Tarifa Zero universal no Brasil. Além disso, também foi utilizada uma base de dados fornecida por Denilson Bandeira Coêlho (2016), a qual contém dados sobre variáveis específicas de 5.564 municíios brasileiros. Importante destacar que esses dados não estão atualizados, tendo como limite o ano de publicação do artigo do autor citado.
+  Foi realizada uma mescla das duas bases de dados e o dataset foi adaptado para essa política em questão, excluindo variáveis que não seriam interessantes e incluindo novas. 
+  Para a testagem das hipóteses sobre a relevância das variáveis de competição política e de PIB per capita, utilizamos a regressão logística por meio do R, com o intuito de medir possíveis correlações com a variável dependente (adoção ou não da Tarifa Zero). A competição política foi medida a partir da média de resultados eleitorais das prefeituras e, também, do número efetivo de partidos. Nesse processo, foram analisados apenas os dados de municípios com uma população entre 20 mil e 100 mil habitantes (totalizando 1370 municípios), em um esforço de tornar o modelo mais equilibrado e, também, viabilizar o processamento dos dados.
+
+
+## Regressão Logística
+
+```{r Tratamento dos dados, echo=FALSE, message=FALSE, warning=FALSE}
+library(pacman)
+
+pacman::p_load(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl)
+
+dados <- read_excel("relatorio.xlsx")
+dados <- dados %>%
+  filter(PORTE %in% c("4 - 20001 até 50000", "5 - 50001 até 100000"))
+dados <- na.omit(dados)
+dados$adotatz <- factor(dados$adotatz, levels = c(0, 1), labels = c("Não", "Sim"))
+dados$adotatz <- relevel(dados$adotatz, ref = "Sim")
+``` 
+
+```{r Construção do modelo, echo=FALSE}
+mod <- glm(adotatz ~ CompetiçãoPolítica + PIBpercapitaMedia,
+           family = binomial(link = 'logit'), data = dados)
+```
+
+```{r Ausência de outliers, echo=FALSE}
+plot(mod, which = 5)
+```
+
+```{r Ausência de multicolinearidade, echo=TRUE}
+vif(mod)
+```
+O resultado do vif próximo de 1 indica a quase ausência de colinearidade, validando as variáveis independentes. 
+
+```{r Relação da VI com seu log, echo=FALSE}
+intlog1 <- dados$CompetiçãoPolítica * log(dados$CompetiçãoPolítica)
+dados$intlog1 <- intlog1
+intlog2 <- dados$PIBpercapitaMedia * log(dados$PIBpercapitaMedia)
+dados$intlog2 <- intlog2
+modint <- glm(adotatz ~ CompetiçãoPolítica + PIBpercapitaMedia + intlog1 + intlog2,
+               family = binomial(link = 'logit'), data = dados)
+summary(modint)
+```
+Essa análise indica que a renda per capita é um fator determinante na adoção da política, enquanto a competição política não mostra um impacto significativo.
+
+
+```{r Análise do modelo, echo=FALSE}
+Anova(mod, type = 'II', test = "Wald")
+summary(mod)
+```
+- CompetiçãoPolítica: Não parece ter um efeito significativo na adoção da Tarifa Zero.
+- PIBpercapitaMedia: Tem um efeito significativo na adoção da Tarifa Zero (p = 0.00843). O coeficiente negativo sugere que, à medida que o PIB per capita médio aumenta, a probabilidade de adoção da Tarifa Zero diminui. Ou seja, municípios com PIB per capita mais alto são menos propensos a adotar a Tarifa Zero.
+
+```{r Obtenção das razões de chance, echo=FALSE}
+exp(cbind(OR = coef(mod), confint.default(mod)))
+PseudoR2(mod, which = "Nagelkerke")
+```
+- O OR de 32.56 sugere que, quando todas as variáveis independentes são zero, a razão de chances de adoção da Tarifa Zero é 32.56 vezes maior do que não adoção. O intervalo de confiança é bastante largo, indicando uma alta incerteza na estimativa.
+
+- CompetiçãoPolítica: Um OR de 0.84 significa que, para cada aumento unitário na CompetiçãoPolítica, as chances de adoção da Tarifa Zero diminuem em cerca de 16% (1 - 0.84). Como o intervalo de confiança inclui 1, não podemos afirmar com certeza que a CompetiçãoPolítica tem um efeito estatisticamente significativo sobre a adoção.
+
+- PIBpercapitaMedia: O OR de 0.99998 sugere que um aumento no PIB per capita está associado a uma ligeira diminuição nas chances de adoção da Tarifa Zero. No entanto, o efeito é muito pequeno e o inteorvalo de confiança também é muito estreito, indicando baixa variação.
+
+ 
+# Conclusão
+
+O modelo de regressão logística binária mostrou que a competição política não é uma previsora para a adoção da Tarifa Zero, mas que o PIB per capita pode ser (X² = 6,9388; p < 0,001; R²Nagelkerke = 0.01337285). Na amostra em questão, ainda que o efeito seja consideravelmente pequeno, quanto maior o PIB per capita do município, menor a chance da implementação dessa política, se contrapondo a nossa hipótese de que quanto maior a renda, maior a chance (OR = 0.9999807; IC 95%; 0.9999664 - 0.9999951). O PIB per capita é estatisticamente significativo, mas o impacto real é muito pequeno. Isso significa que, embora o PIB per capita influencie a adoção da Tarifa Zero de maneira mensurável, a magnitude do efeito é tão pequena que pode não ter um impacto significativo na prática.
+
+---
+
+# Referências
+- COÊLHO, Denilson Bandeira; CAVALCANTE, Pedro; TURGEON, Mathieu. Mecanismos de difusão de políticas sociais no Brasil: uma análise do Programa Saúde da Família. Revista de Sociologia e Política, v. 24, p. 145-165, 2016.
+- DE CARVALHO, Carlos Henrique Ribeiro; PEREIRA, Rafael Henrique Moraes. Efeitos da variação da tarifa e da renda da população sobre a demanda de transporte público coletivo urbano no Brasil. Texto para Discussão, 2011.
+- SANTARÉM, Paíque Duques. Ensaio sobre o incontornável: do ciclo vicioso da tarifa ao ciclo virtuoso da Tarifa Zero. Journal of Sustainable Urban Mobility, v. 3, n. 1, p. 21-32, 2023.
+- SANTINI, Daniel. Passe livre: as possibilidades da tarifa zero contra a distopia da uberização. Autonomia Literária, 2019.
+- Santini, Daniel, 2024, "Brazilian municipalities with full Fare-Free Public Transport policies - updated March 2024", https://doi.org/10.7910/DVN/Z927PD, Harvard Dataverse, V1
+- SCHIAFFINO, Daniela Ponce de Leon; TOLEDO, Juliana Iara de Freitas; RIBEIRO, Renato
+Guimarães. Tarifa Zero: uma reflexão sobre a proposta. CEFET-MG, 2015. Disponível
+em: http://files-server.antp.org.br/_5dotSystem/download/dcmDocument/2015/06/15/C088AE
+18-A9D3-4CCD-9A56-F54E04438370.pdf. Acesso em 06/09/2023.
+
