@@ -1,0 +1,212 @@
+---
+title: "Tarifa Zero no Brasil:"
+subtitle: "a gratuidade no transporte público em municípios brasileiros"
+author: "Aline Maria e João Lucas"
+date: "2024"
+output: 
+  revealjs::revealjs_presentation:
+    css: "custom.css"
+    transition: "fade" 
+    slide_number: true
+    incremental: true
+---
+
+```{r Rodando pacotes e atribuindo base de dados, include=FALSE}
+library(pacman)
+
+pacman::p_load(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl, kableExtra)
+
+dados <- read_excel("relatorio.xlsx")
+```
+
+# Tarifa Zero no Brasil
+O Brasil enfrenta sérios problemas de mobilidade urbana, incluindo congestionamentos intensos, poluição  atmosférica e um incentivo predominante ao uso de veículos individuais. Além disso, o transporte público é frequentemente caro e inacessível para muitos cidadãos. A Tarifa Zero é apresentada como uma solução viável para esses desafios, oferecendo transporte gratuito e promovendo uma alternativa ecológica e acessível. Essa política pode ajudar a reduzir o tráfego, diminuir a poluição e tornar o transporte público uma opção mais atraente e inclusiva para todos.
+
+
+```{r echo=FALSE, fig.align='center', fig.path='imagens/', message=FALSE, warning=FALSE, out.width='58%'}
+knitr::include_graphics("C:\\Users\\jluca\\Pictures\\20230329-tarifa-comercial-zero-2.jpg")
+```
+
+---
+
+# Objetivos
+
+O objetivo principal é mapear a adoção da Tarifa Zero nos transportes públicos das cidades brasileiras. Além disso, a pesquisa analisará a relação entre a Competição Política e o PIB per capita com a adoção dessa política, em uma tentativa de identificar fatores decisivos no processo de sua implementação. As hipóteses testadas são:
+
+- Municípios com alta competitividade política têm maior chance de adotar a Tarifa Zero para que os prefeitos se destaquem nas eleições.
+
+- Municípios com alto PIB per capita são mais propensos a adotar a Tarifa Zero, como um indicador de desenvolvimento econômico.
+
+--- 
+
+# Contexto
+
+Nos últimos anos, especialmente a partir de 2020, a adoção dessa política cresceu significativamente, com mais de 110 dos municípios brasileiros implementando a gratuidade universal. Essa pauta tem ganhado destaque nacional, refletindo sua importância social e política, além de responder à crise de financiamento do transporte público exacerbada pela pandemia. É crucial analisar a evolução e os fatores que influenciam essa implementação, como a competição política e o PIB per capita.
+```{r Municípios com TZ, echo=FALSE, fig.height=5, fig.width=12, message=FALSE, warning=FALSE}
+dados_adocao <- dados[dados$adotatz == 1, ]
+
+adocoes_por_ano <- table(dados_adocao$AnoAdoção)
+df_adocao <- data.frame(
+  AnoAdoção = as.integer(names(adocoes_por_ano)),
+  Adocoes = as.integer(adocoes_por_ano)
+)
+df_adocao$cumulativo <- cumsum(df_adocao$Adocoes)
+ggplot(df_adocao, aes(x = AnoAdoção)) +
+  geom_bar(aes(y = Adocoes, fill = "Municípios que adotaram por ano"), 
+           stat = "identity", width = 0.7, color = "black") +  
+  geom_line(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+            size = 1.5, group = 1) +
+  geom_point(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+             size = 3) +
+  geom_text(aes(y = Adocoes, label = Adocoes), 
+            vjust = -0.5, size = 5, color = "black") +  
+  labs(title = "Municípios com Tarifa Zero",
+       x = "Ano",
+       y = "Número de Municípios") +
+  scale_color_manual(values = c("Total de municípios adotantes" = "darkred")) +
+  scale_fill_manual(values = c("Municípios que adotaram por ano" = "darkgrey")) +
+  scale_x_continuous(breaks = seq(min(df_adocao$AnoAdoção), max(df_adocao$AnoAdoção), by = 1)) +  
+  scale_y_continuous(limits = c(0, 120), breaks = seq(0, 120, by = 10), expand = c(0, 0)) +
+  theme_minimal(base_size = 13) +  
+  theme(
+    axis.text.x = element_text(angle = 47, hjust = 1, size = 12),  
+    axis.text.y = element_text(size = 12), 
+    legend.title = element_blank(),
+    legend.position = "top",
+    legend.text = element_text(size = 12),  # Aumenta o tamanho do texto da legenda
+    plot.title = element_text(size = 16),  # Aumenta o tamanho do título do gráfico
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")  # Margens menores
+  )
+```
+--- 
+
+# Método
+
+Para a realização desse trabalho, foram utilizados os dados compilados por Daniel Santini (2024), referentes aos municípios que adotam a Tarifa Zero universal no Brasil, bem como suas respectivas UFs e porte populacional. Além disso, utilizamos dados provenientes de fontes oficiais como IBGE e TSE, relativos ao PIB per capita e à competição eleitoral (calculada a partir do número efetivo de partidos e dos resultados eleitorais).
+Fizemos uma análise estatística descritiva com o objetivo de estabelecer um panorama dos municípios que adotaram a gratuidade universal no transporte público, identificando o porte populacional e, também, a sua distribuição geográfica pelo país. Também analisamos se o PIB per capita e a competição eleitoral são relevantes no processo de adoção dessa política, a partir de uma amostra dos municípios com uma população entre 20 mil e 100 mil habitantes (totalizando 1370 municípios).
+--- 
+
+# Municípios por porte populacional
+
+```{r Municípios por porte, echo=FALSE}
+dados_adocao$PorteSimplificado <- factor(dados_adocao$PORTE,
+                                         levels = c("1 - Até 5000", 
+                                                    "2 - 5001 até 10000", 
+                                                    "3 - 10001 até 20000", 
+                                                    "4 - 20001 até 50000", 
+                                                    "5 - 50001 até 100000", 
+                                                    "6 - 100001 até 500000"),
+                                         labels = c("Até 5000", 
+                                                    "5001 a 10000", 
+                                                    "10001 a 20000", 
+                                                    "20001 a 50000", 
+                                                    "50001 a 100000", 
+                                                    "100001 a 500000"))
+
+dados_pie <- as.data.frame(table(dados_adocao$PorteSimplificado))
+names(dados_pie) <- c("Porte", "Freq")
+
+ggplot(dados_pie, aes(x = "", y = Freq, fill = Porte)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  geom_text(aes(label = paste(Freq)), 
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 4) +
+  labs(title = "Municípios por porte populacional", 
+       fill = "Porte (habitantes)") +
+  theme_void() +
+  theme(legend.position = "right") +
+  scale_fill_brewer(palette = "Pastel1")
+```
+
+---
+
+# Distribuição Geográfica
+```{r organização dados, include=FALSE}
+codigo_para_estado <- data.frame(
+  CODIGO = c("12", "27", "13", "16", "29", "23", "53", "32", "52", "21", 
+             "31", "50", "51", "15", "25", "26", "22", "41", "33", "24", 
+             "43", "11", "14", "42", "28", "35", "17"),
+  SIGLA = c("AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", 
+            "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", 
+            "RS", "RO", "RR", "SC", "SE", "SP", "TO"),
+  NOME = c("Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", 
+           "Distrito Federal", "Espírito Santo", "Goiás", "Maranhão", 
+           "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", 
+           "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", 
+           "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", 
+           "Roraima", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins")
+)
+
+dados_com_estados <- dados_adocao %>%
+  left_join(codigo_para_estado, by = c("UF" = "CODIGO"))
+tabela_adocao_por_estado <- dados_com_estados %>%
+  group_by(NOME, SIGLA) %>%
+  summarise(Num_Municipios_Adotantes = n()) %>%
+  arrange(desc(Num_Municipios_Adotantes))
+```
+
+```{r criação tabela, echo=FALSE, message=FALSE, warning=FALSE}
+tabela_adocao_por_estado %>%
+  kbl(col.names = c("Estado", "Sigla", "Número de Municípios Adotantes"), 
+      align = c('l', 'c', 'r')) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
+                full_width = FALSE, font_size = 16) %>%
+  column_spec(1, bold = TRUE, width = "5cm") %>%
+  column_spec(3, bold = TRUE, color = "black", background = "#651b1b", width = "5cm") %>%
+  row_spec(0, bold = TRUE, background = "#e0d1d1")
+```
+--- 
+
+# Relevância das variáveis: competição política e PIB per capita
+
+```{r Tratamento dos dados, message=FALSE, warning=FALSE, include=FALSE}
+dados <- dados %>%
+  filter(PORTE %in% c("4 - 20001 até 50000", "5 - 50001 até 100000"))
+dados <- na.omit(dados)
+dados$adotatz <- factor(dados$adotatz, levels = c(0, 1), labels = c("Não", "Sim"))
+dados$adotatz <- relevel(dados$adotatz, ref = "Sim")
+``` 
+
+```{r Construção do modelo, include=FALSE}
+mod <- glm(adotatz ~ CompetiçãoPolítica + PIBpercapitaMedia,
+           family = binomial(link = 'logit'), data = dados)
+```
+
+```{r teste de relevância estatística, echo=FALSE}
+anova_table <- Anova(mod, type = 'II', test = "Wald")
+print(anova_table)
+```
+- CompetiçãoPolítica: Não parece ter um efeito significativo na adoção da Tarifa Zero.
+- PIBpercapitaMedia: Tem um efeito significativo na adoção da Tarifa Zero (p = 0.00843). O coeficiente negativo sugere que, à medida que o PIB per capita médio aumenta, a probabilidade de adoção da Tarifa Zero diminui. Ou seja, municípios com PIB per capita mais alto são menos propensos a adotar a Tarifa Zero.
+
+---
+
+# Razões de chance
+```{r Obtenção das razões de chance, include=FALSE}
+exp(cbind(OR = coef(mod), confint.default(mod)))
+PseudoR2(mod, which = "Nagelkerke")
+or_data <- as.data.frame(exp(cbind(OR = coef(mod), confint.default(mod))))
+or_data$Variable <- rownames(or_data)
+or_data <- or_data %>% filter(Variable != "(Intercept)")
+```
+```{r gráfico razão de chances, echo=FALSE, fig.height=4, fig.width=12}
+ggplot(or_data, aes(x = Variable, y = OR)) +
+  geom_bar(stat = "identity", fill = "darkred") +
+  geom_errorbar(aes(ymin = `2.5 %`, ymax = `97.5 %`), width = 0.2) +
+  theme_minimal() +
+  labs(title = "Razões de Chance (Odds Ratios) com Intervalos de Confiança",
+       y = "Razão de Chance (OR)", x = "Variáveis") +
+  coord_flip()
+```
+
+--- 
+# Conclusão
+
+- É notório o aumento no número de adoções da Tarifa Zero no Brasil, especialmente após a pandemia de 2020.
+
+- Dos 114 municípios adotantes, 52 têm o porte populacional entre 20 e 50 mil habitantes.
+
+- São Paulo é o estado com mais municípios adotantes, seguido por Minas Gerais e Paraná. Destaque para a região sudeste como região com mais municípios adotantes.
+
+- O modelo de regressão logística binária mostrou que a competição política não é uma previsora para a adoção da Tarifa Zero, mas que o PIB per capita pode ser. Na amostra em questão, ainda que o efeito seja consideravelmente pequeno, quanto maior o PIB per capita do município, menor a chance da implementação dessa política, se contrapondo a nossa hipótese de que quanto maior a renda, maior a chance. O PIB per capita é estatisticamente significativo, mas o impacto real é muito pequeno. Isso significa que, embora o PIB per capita influencie a adoção da Tarifa Zero de maneira mensurável, a magnitude do efeito é tão pequena que pode não ter um impacto significativo na prática.
