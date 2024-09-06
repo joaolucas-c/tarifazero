@@ -8,6 +8,14 @@ output:
 ---
 # Objeto: Tarifa Zero no Brasil
 
+```{r Rodando pacotes e atribuindo base de dados, include=FALSE}
+library(pacman)
+
+pacman::p_load(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl, MASS, pscl, xaringan)
+
+dados <- read_excel("relatorio.xlsx")
+```
+
 No Brasil, o sistema de transporte coletivo urbano é um serviço público, sendo comumente operado por empresas privadas a partir de concessões ou permissões, municipais ou distritais (Schiaffino; Toledo; Ribeiro, 2015). Dessa forma, apesar do governo gerir esse serviço, o seu funcionamento está suscetível às demandas e interesses de grandes empresários do transporte. Sendo assim, o valor das tarifas a ser pago pelo próprio usuário tende a ser, muitas vezes, insustentável para uma parcela significativa das pessoas que dependem desse serviço para se locomover (de Carvalho, 2011). 
   A implementação da Tarifa Zero universal nos transportes coletivos tem sido proposta como uma possível solução para a promoção do direito à cidade, como uma forma de mitigar as desigualdades características do contexto urbano capitalista. Partidos, ativistas, movimentos sociais e pesquisadores do tema reivindicam a luta pela Tarifa Zero enquanto política de promoção não só do direito à cidade, mas também de alternativas ecológicas e mais saudáveis de funcionamento da mobilidade urbana em geral. 
   Hoje, estima-se que mais de 110 cidades adotam essa política, e a discussão sobre as condições para a sua implementação tem ganhado destaque no debate público. Dentre as regiões, a sudeste é a que mais demonstra adesão em relação à tarifa zero no transporte público.
@@ -31,15 +39,75 @@ No Brasil, o sistema de transporte coletivo urbano é um serviço público, send
   Foi realizada uma mescla das duas bases de dados e o dataset foi adaptado para essa política em questão, excluindo variáveis que não seriam interessantes e incluindo novas. 
   Para a testagem das hipóteses sobre a relevância das variáveis de competição política e de PIB per capita, utilizamos a regressão logística por meio do R, com o intuito de medir possíveis correlações com a variável dependente (adoção ou não da Tarifa Zero). A competição política foi medida a partir da média de resultados eleitorais das prefeituras e, também, do número efetivo de partidos. Nesse processo, foram analisados apenas os dados de municípios com uma população entre 20 mil e 100 mil habitantes (totalizando 1370 municípios), em um esforço de tornar o modelo mais equilibrado e, também, viabilizar o processamento dos dados.
 
+## Contexto nacional
 
+```{r Municípios com TZ, echo=FALSE}
+dados_adocao <- dados[dados$adotatz == 1, ]
+
+adocoes_por_ano <- table(dados_adocao$AnoAdoção)
+df_adocao <- data.frame(
+  AnoAdoção = as.integer(names(adocoes_por_ano)),
+  Adocoes = as.integer(adocoes_por_ano)
+)
+df_adocao$cumulativo <- cumsum(df_adocao$Adocoes)
+```
+
+```{r}
+ggplot(df_adocao, aes(x = AnoAdoção)) +
+  geom_bar(aes(y = Adocoes, fill = "Municípios que adotaram por ano"), 
+           stat = "identity", width = 0.5, color = "black") +  # Ajuste na largura das barras
+  geom_line(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+            size = 1.5, group = 1) +
+  geom_point(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+             size = 3) +
+  geom_text(aes(y = Adocoes, label = Adocoes), 
+            vjust = -0.5, size = 4, color = "black") +
+  labs(title = "Municípios com Tarifa Zero",
+       x = "Ano",
+       y = "Número de Municípios") +
+  scale_color_manual(values = c("Total de municípios adotantes" = "black")) +
+  scale_fill_manual(values = c("Municípios que adotaram por ano" = "darkgreen")) +
+  scale_x_continuous(breaks = seq(min(df_adocao$AnoAdoção), max(df_adocao$AnoAdoção), by = 1)) +  # Mostra todos os anos no eixo x
+  scale_y_continuous(limits = c(0, 120), breaks = seq(0, 120, by = 10), expand = c(0, 0)) +  # Eixo y de 10 em 10 até 120
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.title = element_blank(),
+        legend.position = "top")
+```
+
+```{r Municípios por porte, echo=FALSE}
+dados_adocao$PorteSimplificado <- factor(dados_adocao$PORTE,
+                                         levels = c("1 - Até 5000", 
+                                                    "2 - 5001 até 10000", 
+                                                    "3 - 10001 até 20000", 
+                                                    "4 - 20001 até 50000", 
+                                                    "5 - 50001 até 100000", 
+                                                    "6 - 100001 até 500000"),
+                                         labels = c("Até 5000", 
+                                                    "5001 a 10000", 
+                                                    "10001 a 20000", 
+                                                    "20001 a 50000", 
+                                                    "50001 a 100000", 
+                                                    "100001 a 500000"))
+
+dados_pie <- as.data.frame(table(dados_adocao$PorteSimplificado))
+names(dados_pie) <- c("Porte", "Freq")
+
+ggplot(dados_pie, aes(x = "", y = Freq, fill = Porte)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  geom_text(aes(label = paste(Freq)), 
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 4) +
+  labs(title = "Municípios por porte populacional", 
+       fill = "Porte (habitantes)") +
+  theme_void() +
+  theme(legend.position = "right") +
+  scale_fill_brewer(palette = "Pastel1")
+```
 ## Regressão Logística
 
 ```{r Tratamento dos dados, echo=FALSE, message=FALSE, warning=FALSE}
-library(pacman)
-
-pacman::p_load(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl)
-
-dados <- read_excel("relatorio.xlsx")
 dados <- dados %>%
   filter(PORTE %in% c("4 - 20001 até 50000", "5 - 50001 até 100000"))
 dados <- na.omit(dados)

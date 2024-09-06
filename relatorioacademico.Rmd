@@ -1,0 +1,259 @@
+---
+title: "Tarifa Zero no Brasil"
+author: "Aline Maria e João Lucas"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: '2'
+    df_print: paged
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    highlight: tango
+---
+```{r include=FALSE}
+library(pacman)
+
+pacman::p_load(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl, kableExtra)
+```
+# Resumo
+
+- É clara a importância do transporte público para o funcionamento das cidades e para o desenvolvimento humano de seus habitantes, já que a mobilidade urbana afeta o acesso a bens, direitos e serviços. Sendo um serviço fundamental para a garantia de cidadania, a falta de acesso ou desafios que dificultam o uso a esse serviço implica no não atendimento a esses elementos. Nesse sentido, impedir o uso do serviço de transporte público por meio da cobrança tarifária direta significa restringir o acesso a certos grupos sociais que são segregados de forma socioespacial. Isso intensifica diferentes formas de desigualdade que atravessam o contexto urbano. 
+- Assim, apontamos a Tarifa Zero como fator de grande relevância social, pois compreendemos que a sua implementação pode beneficiar grupos sociais diversos. O seu impacto tem potencial de alcance para além dos usuários do serviço, pode influenciar a reduzir congestionamentos e poluição, por exemplo (Santini, 2023). A pesquisa tem como perspectiva olhar para dados relacionados à tarifa zero entre 1997 e 2010.
+- A partir disso, nosso objetivo é estabelecer um cenário acerca da ampliação da implementação da Tarifa Zero nos sistemas de transporte público dos municípios brasileiros, tendo em vista  a correlação entre as variáveis “Competição Política” e “Produto Interno Bruto (PIB) per capita” com a adoção dessa política. 
+- Temos como hipóteses que municípios que possuem grande competitividade política, em relação às eleições que acontecem no executivo no âmbito municipal, têm maiores chances de adotarem a tarifa zero em decorrência da pressão durante a corrida eleitoral para diferenciar-se dos demais candidatos. Além disso, acreditamos que municípios com o PIB per capita elevado possuem maior possibilidade de adotar a tarifa zero no sistema de transporte, pois é atribuída como um indicador de desenvolvimento econômico do município.
+- A análise mostra que, embora a Tarifa Zero tenha começado em 1992, sua popularidade cresceu após a pandemia de COVID-19, possivelmente devido à crise no financiamento do transporte público agravada pela redução de circulação nas cidades. Observamos que a maioria dos municípios que adotaram a política são de pequeno porte, com destaque para os estados de São Paulo, Minas Gerais e Paraná, sendo o Sudeste a região mais concentrada. Isso abre espaço para futuras investigações sobre os fatores que influenciam essa configuração atual e os motivos que determinam esses padrões.
+- Fazendo uso de um modelo de regressão logística binária identificamos que a competição política não é uma provisão para a adoção da Tarifa Zero, diferente do PIB per capita que pode ser. Mesmo o efeito sendo fortemente pequeno, quanto maior o PIB per capita do município, menor a chance de implementar a política.
+- Ou seja, a nossa hipótese de que quanto maior a renda, maior a chance é contraposta. O PIB per capita é uma estatística significativa, mas o impacto real é mínimo. Isso significa que, apesar do PIB per capita influenciar a adoção da Tarifa Zero de maneira em que seja viável a mensuração, o tamanho do efeito é tão pequeno que pode não ter um impacto significativo na realidade.
+
+
+
+# 1 Introdução
+
+  No Brasil, o sistema de transporte coletivo urbano é um serviço público, sendo comumente operado por empresas privadas a partir de concessões ou permissões, municipais ou distritais (Schiaffino; Toledo; Ribeiro, 2015). Dessa forma, apesar do governo gerir esse serviço, o seu funcionamento está suscetível às demandas e interesses de grandes empresários do transporte, inserindo no custo do serviço uma margem para garantir a lucratividade. Nesse cenário, o valor das tarifas a ser pago pelo próprio usuário tende a ser, muitas vezes, insustentável para uma parcela significativa das pessoas que dependem desse serviço para se locomover (de Carvalho, 2011).
+
+  A implementação da Tarifa Zero universal nos transportes coletivos tem sido proposta como uma possível solução para a promoção do direito à cidade, como uma forma de mitigar as desigualdades características do contexto urbano capitalista. Partidos, ativistas, movimentos sociais e pesquisadores do tema reivindicam a luta pela Tarifa Zero enquanto política de promoção não só do direito à cidade, mas também de alternativas ecológicas e mais saudáveis de funcionamento da mobilidade urbana em geral.
+
+  Hoje, estima-se que mais de 110 cidades adotam essa política no Brasil, e a discussão sobre as condições para a sua implementação tem ganhado destaque no debate público.
+
+
+
+## 1.1 Objetivos
+
+  Essa pesquisa tem como objetivo geral estabelecer um panorama sobre a difusão da implementação da Tarifa Zero nos sistemas de transporte público dos municípios brasileiros. Além disso, também serão analisadas a correlação entre as variáveis Competição Política e PIB per capita com a adoção dessa política.
+
+  Nesse sentido, testamos as seguintes hipóteses:
+  
+- Municípios com alta competitividade política (relacionado às eleições do executivo municipal) estão mais propensos à adoção devido à pressão para se diferenciar dos outros candidatos.
+- Municípios com alto PIB per capita estão mais propensos à adoção, pois essa medida é utilizada como um proxy de desenvolvimento econômico do município.
+
+
+
+## 1.2 Justificativa
+
+  É evidente a relevância do transporte público no funcionamento das cidades e na vida de seus habitantes, sendo um serviço essencial para a garantia de uma cidadania plena à medida que o acesso à mobilidade urbana interfere no acesso a outros direitos e serviços. Nesse sentido, impossibilitar a utilização do serviço de transporte público por meio da cobrança de tarifas diretas incompatíveis com a renda de determinados grupos sociais significa reproduzir segregações socioespaciais e intensificar as distintas formas de desigualdade que perpassam o contexto urbano.
+
+  De acordo com a base de dados de Daniel Santini (2024), cerca de 58% dos municípios brasileiros que adotam sistemas de gratuidade universal no transporte coletivo o fizeram a partir de 2020, abrangendo cidades de diferentes tamanhos e localizadas em todas as 5 regiões do Brasil. Segundo Santarém (2023), essa pauta já ganhou centralidade na política institucional de grandes capitais do país e recebeu relativa atenção nacional, não só pelo seu benefício social e ambiental, mas também em virtude da crise de financiamento do transporte público que atinge parte significativa dos municípios (intensificada pela redução de passageiros graças à pandemia de COVID-19).
+
+  Isso posto, é de grande relevância estabelecer um panorama que analise o histórico de implementação dessa política e que entenda se determinadas características (competição política e PIB per capita) são relevantes nesse processo.
+
+
+
+# 2 Método
+
+  Para a realização desse trabalho, foram utilizados os dados compilados por Daniel Santini (2024), referentes aos municípios que adotam a Tarifa Zero universal no Brasil. Além disso, também foi utilizada uma base de dados fornecida por Denilson Bandeira Coêlho (2016), a qual contém dados sobre variáveis específicas de 5.564 municípios brasileiros. Importante destacar que esses dados não estão atualizados, tendo como limite o ano de publicação do artigo do autor citado.
+
+ Foi realizada uma mescla das duas bases de dados e o dataset foi adaptado para essa política em questão, excluindo variáveis que não seriam interessantes e incluindo novas.
+  Primeiramente, realizamos uma análise estatística descritiva desses dados, com o intuito de estabelecer um panorama sobre a evolução da adoção da Tarifa Zero nos municípios brasileiras, o porte desses municípios e a sua distribuição no território brasileiro (tendo como base seus estados). 
+  Posteriormente, para a testagem das hipóteses sobre a relevância das variáveis de competição política e de PIB per capita, utilizamos a regressão logística por meio do R, com o intuito de medir possíveis correlações com a variável dependente (adoção ou não da Tarifa Zero). Nesse processo, foram analisados apenas os dados de municípios com uma população entre 20 mil e 100 mil habitantes (totalizando 1370 municípios), em um esforço de tornar o modelo mais equilibrado e, também, viabilizar o processamento dos dados.
+
+
+
+# 3 Análise
+
+### 3.1 Linha do tempo
+É notório o aumento no número de adoções da Tarifa Zero no Brasil, especialmente após a pandemia de COVID-19 em 2020.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+dados <- readxl::read_excel("relatorio.xlsx")
+dados_adocao <- dados[dados$adotatz == 1, ]
+adocoes_por_ano <- table(dados_adocao$AnoAdoção)
+df_adocao <- data.frame(
+  AnoAdoção = as.integer(names(adocoes_por_ano)),
+  Adocoes = as.integer(adocoes_por_ano)
+)
+df_adocao$cumulativo <- cumsum(df_adocao$Adocoes)
+
+ggplot(df_adocao, aes(x = AnoAdoção)) +
+  geom_bar(aes(y = Adocoes, fill = "Municípios que adotaram por ano"), 
+           stat = "identity", width = 0.5, color = "black") +
+  geom_line(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+            size = 1.5, group = 1) +
+  geom_point(aes(y = cumulativo, color = "Total de municípios adotantes"), 
+             size = 3) +
+  geom_text(aes(y = Adocoes, label = Adocoes), 
+            vjust = -0.5, size = 4, color = "black") +
+  labs(title = "Municípios com Tarifa Zero",
+       x = "Ano",
+       y = "Número de Municípios") +
+  scale_color_manual(values = c("Total de municípios adotantes" = "black")) +
+  scale_fill_manual(values = c("Municípios que adotaram por ano" = "darkred")) +
+  scale_x_continuous(breaks = seq(min(df_adocao$AnoAdoção), max(df_adocao$AnoAdoção), by = 1)) +
+  scale_y_continuous(limits = c(0, 120), breaks = seq(0, 120, by = 10), expand = c(0, 0)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.title = element_blank(),
+        legend.position = "top")
+```
+
+
+### 3.2 Distribuição geográfica
+
+```{r organização dados, include=FALSE}
+codigo_para_estado <- data.frame(
+  CODIGO = c("12", "27", "13", "16", "29", "23", "53", "32", "52", "21", 
+             "31", "50", "51", "15", "25", "26", "22", "41", "33", "24", 
+             "43", "11", "14", "42", "28", "35", "17"),
+  SIGLA = c("AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", 
+            "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", 
+            "RS", "RO", "RR", "SC", "SE", "SP", "TO"),
+  NOME = c("Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", 
+           "Distrito Federal", "Espírito Santo", "Goiás", "Maranhão", 
+           "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", 
+           "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", 
+           "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia", 
+           "Roraima", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins")
+)
+
+dados_com_estados <- dados_adocao %>%
+  left_join(codigo_para_estado, by = c("UF" = "CODIGO"))
+tabela_adocao_por_estado <- dados_com_estados %>%
+  group_by(NOME, SIGLA) %>%
+  summarise(Num_Municipios_Adotantes = n()) %>%
+  arrange(desc(Num_Municipios_Adotantes))
+```
+Percebemos uma alta concentração nos estados do sudeste brasileiro.
+
+```{r criação tabela, echo=FALSE, message=FALSE, warning=FALSE}
+tabela_adocao_por_estado %>%
+  kbl(col.names = c("Estado", "Sigla", "Número de Municípios Adotantes"), 
+      align = c('l', 'c', 'r')) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
+                full_width = FALSE, font_size = 16) %>%
+  column_spec(1, bold = TRUE, width = "5cm") %>%
+  column_spec(3, bold = TRUE, color = "black", background = "#651b1b", width = "5cm") %>%
+  row_spec(0, bold = TRUE, background = "#e0d1d1")
+```
+
+
+### 3.3 Municípios por porte
+
+```{r echo=FALSE}
+dados_adocao$PorteSimplificado <- factor(dados_adocao$PORTE,
+                                         levels = c("1 - Até 5000", 
+                                                    "2 - 5001 até 10000", 
+                                                    "3 - 10001 até 20000", 
+                                                    "4 - 20001 até 50000", 
+                                                    "5 - 50001 até 100000", 
+                                                    "6 - 100001 até 500000"),
+                                         labels = c("Até 5000", 
+                                                    "5001 a 10000", 
+                                                    "10001 a 20000", 
+                                                    "20001 a 50000", 
+                                                    "50001 a 100000", 
+                                                    "100001 a 500000"))
+
+dados_pie <- as.data.frame(table(dados_adocao$PorteSimplificado))
+names(dados_pie) <- c("Porte", "Freq")
+
+ggplot(dados_pie, aes(x = "", y = Freq, fill = Porte)) +
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  geom_text(aes(label = paste(Freq)), 
+            position = position_stack(vjust = 0.5), 
+            color = "black", size = 4) +
+  labs(title = "", 
+       fill = "Porte (habitantes)") +
+  theme_void() +
+  theme(legend.position = "right") +
+  scale_fill_brewer(palette = "Pastel1")
+```
+
+Vemos que a grande maioria os municípios adotantes se enquadram na categoria de pequeno porte (até 100 mil habitantes).
+
+
+### 3.4  Influência da Competição Política e do PIB per capita
+```{r Tratamento dos dados, message=FALSE, warning=FALSE, include=FALSE}
+dados <- dados %>%
+  filter(PORTE %in% c("4 - 20001 até 50000", "5 - 50001 até 100000"))
+dados <- na.omit(dados)
+dados$adotatz <- factor(dados$adotatz, levels = c(0, 1), labels = c("Não", "Sim"))
+dados$adotatz <- relevel(dados$adotatz, ref = "Sim")
+``` 
+
+```{r Construção do modelo, include=FALSE}
+mod <- glm(adotatz ~ CompetiçãoPolítica + PIBpercapitaMedia,
+           family = binomial(link = 'logit'), data = dados)
+```
+
+```{r Ausência de outliers, include=FALSE}
+plot(mod, which = 5)
+```
+
+```{r Ausência de multicolinearidade, include=FALSE}
+vif(mod)
+```
+
+```{r teste de relevância estatística, echo=FALSE}
+anova_table <- Anova(mod, type = 'II', test = "Wald")
+print(anova_table)
+```
+
+- CompetiçãoPolítica: Não parece ter um efeito significativo na adoção da Tarifa Zero.
+- PIBpercapitaMedia: Tem um efeito significativo na adoção da Tarifa Zero (p = 0.00843). O coeficiente negativo sugere que, à medida que o PIB per capita médio aumenta, a probabilidade de adoção da Tarifa Zero diminui. Ou seja, municípios com PIB per capita mais alto são menos propensos a adotar a Tarifa Zero.
+
+
+Razões de chance
+
+```{r Obtenção das razões de chance, include=FALSE}
+exp(cbind(OR = coef(mod), confint.default(mod)))
+PseudoR2(mod, which = "Nagelkerke")
+or_data <- as.data.frame(exp(cbind(OR = coef(mod), confint.default(mod))))
+or_data$Variable <- rownames(or_data)
+or_data <- or_data %>% filter(Variable != "(Intercept)")
+```
+
+```{r gráfico razão de chances, echo=FALSE, fig.height=4, fig.width=12}
+ggplot(or_data, aes(x = Variable, y = OR)) +
+  geom_bar(stat = "identity", fill = "darkred") +
+  geom_errorbar(aes(ymin = `2.5 %`, ymax = `97.5 %`), width = 0.2) +
+  theme_minimal() +
+  labs(title = "Razões de Chance (Odds Ratios) com Intervalos de Confiança",
+       y = "Razão de Chance (OR)", x = "Variáveis") +
+  coord_flip()
+```
+
+- CompetiçãoPolítica: Um OR de 0.84 significa que, para cada aumento unitário na CompetiçãoPolítica, as chances de adoção da Tarifa Zero diminuem em cerca de 16% (1 - 0.84). Como o intervalo de confiança inclui 1, não podemos afirmar com certeza que a CompetiçãoPolítica tem um efeito estatisticamente significativo sobre a adoção.
+- PIBpercapitaMedia: O OR de 0.99998 sugere que um aumento no PIB per capita está associado a uma ligeira diminuição nas chances de adoção da Tarifa Zero. No entanto, o efeito é muito pequeno e o inteorvalo de confiança também é muito estreito, indicando baixa variação.
+
+
+
+# 4 Considerações finais
+
+Com base na análise realizada, observamos que a adoção da Tarifa Zero, apesar de se iniciar em 1992, só começou a realmente se popularizar após a pandemia de COVID-19. Acredita-se que a redução da circulação de pessoas nas cidades intensificou o processo de crise no financiamento do transporte público que já ocorria anteriormente. Além disso, também identificamos o perfil dos municípios adotantes a partir do seu porte populacional (majoritariamente municípios de pequeno porte) e, também, a partir de sua Unidade Federativa (São Paulo em primeiro, seguido de Minas Gerais e do Paraná). Destacamos a alta concentração nos estados do sudeste.
+Nesse cenário, abre-se caminhos para investigações futuras sobre as possíveis motivações dessa configuração atual, de maneira a identificar o que determina ou influencia na formação desses padrões.
+Já sobre a influência das variáveis de competição política e de PIB per capita, identificou-se que a primeira não é estatisticamente relevante na adoção da Tarifa Zero. Já a segunda é estatisticamente relevante, mas seu efeito é tão marginal que pode ser questionada a sua real importância nesse processo. Além disso, a análise indeicou que a sua relação com a adoção é contrária à nossa hipótese inicial, ou seja, quanto maior o PIB per capita menor a chance de se implementar essa política. 
+No entanto, vale destacar que nesse estudo foram utilizados dados não atualizados e, também, foi realizado um recorte a fim de equilibrar o modelo de regressão e de auxiliar no processamento dos dados. Portanto, é necessário que se realizem pesquisas com dados atualizados e a partir de outros recortes, no intuito de se construir uma análise mais robusta e completa sobre esse tema.
+
+
+
+# Referências
+- COÊLHO, Denilson Bandeira; CAVALCANTE, Pedro; TURGEON, Mathieu. Mecanismos de difusão de políticas sociais no Brasil: uma análise do Programa Saúde da Família. Revista de Sociologia e Política, v. 24, p. 145-165, 2016.
+- DE CARVALHO, Carlos Henrique Ribeiro; PEREIRA, Rafael Henrique Moraes. Efeitos da variação da tarifa e da renda da população sobre a demanda de transporte público coletivo urbano no Brasil. Texto para Discussão, 2011.
+- SANTARÉM, Paíque Duques. Ensaio sobre o incontornável: do ciclo vicioso da tarifa ao ciclo virtuoso da Tarifa Zero. Journal of Sustainable Urban Mobility, v. 3, n. 1, p. 21-32, 2023.
+- SANTINI, Daniel. Passe livre: as possibilidades da tarifa zero contra a distopia da uberização. Autonomia Literária, 2019.
+- Santini, Daniel, 2024, "Brazilian municipalities with full Fare-Free Public Transport policies - updated March 2024", https://doi.org/10.7910/DVN/Z927PD, Harvard Dataverse, V1
+- SCHIAFFINO, Daniela Ponce de Leon; TOLEDO, Juliana Iara de Freitas; RIBEIRO, Renato
+Guimarães. Tarifa Zero: uma reflexão sobre a proposta. CEFET-MG, 2015. Disponível
+em: http://files-server.antp.org.br/_5dotSystem/download/dcmDocument/2015/06/15/C088AE
+18-A9D3-4CCD-9A56-F54E04438370.pdf. Acesso em 06/09/2023.

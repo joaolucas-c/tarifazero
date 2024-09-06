@@ -1,0 +1,317 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Tarifa Zero no Brasil},
+  pdfauthor={Aline Maria e João Lucas},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Tarifa Zero no Brasil}
+\author{Aline Maria e João Lucas}
+\date{2024-09-06}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(pacman)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'pacman' was built under R version 4.3.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pacman}\SpecialCharTok{::}\FunctionTok{p\_load}\NormalTok{(dplyr, psych, car, MASS, DescTools, QuantPsyc, ggplot2, readxl, kableExtra)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Objeto: Tarifa Zero no
+Brasil}\label{objeto-tarifa-zero-no-brasil}
+
+No Brasil, o sistema de transporte coletivo urbano é um serviço público,
+sendo comumente operado por empresas privadas a partir de concessões ou
+permissões, municipais ou distritais (Schiaffino; Toledo; Ribeiro,
+2015). Dessa forma, apesar do governo gerir esse serviço, o seu
+funcionamento está suscetível às demandas e interesses de grandes
+empresários do transporte. Sendo assim, o valor das tarifas a ser pago
+pelo próprio usuário tende a ser, muitas vezes, insustentável para uma
+parcela significativa das pessoas que dependem desse serviço para se
+locomover (de Carvalho, 2011).
+
+A implementação da Tarifa Zero universal nos transportes coletivos tem
+sido proposta como uma possível solução para a promoção do direito à
+cidade, como uma forma de mitigar as desigualdades características do
+contexto urbano capitalista. Partidos, ativistas, movimentos sociais e
+pesquisadores do tema reivindicam a luta pela Tarifa Zero enquanto
+política de promoção não só do direito à cidade, mas também de
+alternativas ecológicas e mais saudáveis de funcionamento da mobilidade
+urbana em geral.
+
+Hoje, estima-se que mais de 110 cidades adotam essa política, e a
+discussão sobre as condições para a sua implementação tem ganhado
+destaque no debate público. Dentre as regiões, a Sudeste é a que mais
+demonstra adesão em relação à tarifa zero no transporte público.
+
+\section{Objetivos}\label{objetivos}
+
+Essa pesquisa tem como objetivo geral estabelecer um panorama sobre a
+difusão da implementação da Tarifa Zero nos sistemas de transporte
+público dos municípios brasileiros. Além disso, também serão analisadas
+a correlação entre as variáveis Competição Política e PIB per capita com
+a adoção dessa política.
+
+Nesse sentido, testamos as seguintes hipóteses: - Municípios com alta
+competitividade política (relacionado às eleições do executivo
+municipal) estão mais propensos à adoção devido à pressão para se
+diferenciar dos outros candidatos. - Municípios com alto PIB per capita
+estão mais propensos à adoção, pois essa medida é utilizada como um
+proxy de desenvolvimento econômico do município.
+
+\section{Justificativa}\label{justificativa}
+
+É evidente a relevância do transporte público no funcionamento das
+cidades e na vida de seus habitantes, sendo um serviço essencial para a
+garantia de uma cidadania plena à medida que o acesso à mobilidade
+urbana interfere no acesso a outros direitos e serviços. Nesse sentido,
+impossibilitar a utilização do serviço de transporte público por meio da
+cobrança de tarifas diretas incompatíveis com a renda de determinados
+grupos sociais significa reproduzir segregações socioespaciais e
+intensificar as distintas formas de desigualdade que perpassam o
+contexto urbano.
+
+Como já apresentado, segundo a base de dados de Daniel Santini, cerca de
+58\% dos municípios brasileiros que adotam sistemas de gratuidade
+universal no transporte coletivo o fizeram a partir de 2020, abrangendo
+cidades de diferentes tamanhos e localizadas em todas as 5 regiões do
+Brasil. Segundo Santarém (2023), essa pauta já ganhou centralidade na
+política institucional de grandes capitais do país e recebeu relativa
+atenção nacional, não só pelo seu benefício social e ambiental, mas
+também em virtude da crise de financiamento do transporte público que
+atinge parte significativa dos municípios (intensificada pela redução de
+passageiros graças à pandemia de COVID-19).
+
+Isso posto, é de grande relevância estabelecer um panorama que analise o
+histórico de implementação dessa política e que entenda se determinadas
+características (competição política e PIB per capita) são relevantes
+nesse processo.
+
+\section{Método}\label{muxe9todo}
+
+Para a realização desse trabalho, foram utilizados os dados compilados
+por Daniel Santini (2024), referentes aos municípios que adotam a Tarifa
+Zero universal no Brasil. Além disso, também foi utilizada uma base de
+dados fornecida por Denilson Bandeira Coêlho (2016), a qual contém dados
+sobre variáveis específicas de 5.564 municípios brasileiros. Importante
+destacar que esses dados não estão atualizados, tendo como limite o ano
+de publicação do artigo do autor citado.
+
+Foi realizada uma mescla das duas bases de dados e o dataset foi
+adaptado para essa política em questão, excluindo variáveis que não
+seriam interessantes e incluindo novas.
+
+Para a testagem das hipóteses sobre a relevância das variáveis de
+competição política e de PIB per capita, utilizamos a regressão
+logística por meio do R, com o intuito de medir possíveis correlações
+com a variável dependente (adoção ou não da Tarifa Zero). A competição
+política foi medida a partir da média de resultados eleitorais das
+prefeituras e, também, do número efetivo de partidos. Nesse processo,
+foram analisados apenas os dados de municípios com uma população entre
+20 mil e 100 mil habitantes (totalizando 1370 municípios), em um esforço
+de tornar o modelo mais equilibrado e, também, viabilizar o
+processamento dos dados.
+
+\section{Análise}\label{anuxe1lise}
+
+\subsection{Contexto Nacional}\label{contexto-nacional}
+
+\begin{verbatim}
+## Warning: Expecting numeric in G1526 / R1526C7: got '#NULL!'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Expecting numeric in I1526 / R1526C9: got '#NULL!'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## i Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\includegraphics{relatorioacademico_files/figure-latex/unnamed-chunk-2-1.pdf}
+\#\# Municípios por porte
+
+\includegraphics{relatorioacademico_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\subsection{Regressão Logística}\label{regressuxe3o-loguxedstica}
+
+\begin{verbatim}
+## Analysis of Deviance Table (Type II tests)
+## 
+## Response: adotatz
+##                    Df  Chisq Pr(>Chisq)   
+## CompetiçãoPolítica  1 0.2627   0.608239   
+## PIBpercapitaMedia   1 6.9388   0.008435 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  CompetiçãoPolítica: Não parece ter um efeito significativo na adoção
+  da Tarifa Zero.
+\item
+  PIBpercapitaMedia: Tem um efeito significativo na adoção da Tarifa
+  Zero (p = 0.00843). O coeficiente negativo sugere que, à medida que o
+  PIB per capita médio aumenta, a probabilidade de adoção da Tarifa Zero
+  diminui. Ou seja, municípios com PIB per capita mais alto são menos
+  propensos a adotar a Tarifa Zero.
+\end{itemize}
+
+\subsection{Razões de chance}\label{razuxf5es-de-chance}
+
+\includegraphics{relatorioacademico_files/figure-latex/gráfico razão de chances-1.pdf}
+
+\section{Conclusões}\label{conclusuxf5es}
+
+Com base na análise realizada, observamos que a competição política tem
+um efeito positivo significativo na adoção da Tarifa Zero, indicando que
+municípios com maior competição política são mais propensos a adotar
+essa política. O PIB per capita não demonstrou um efeito tão
+significativo quanto a competição política. Portanto, a hipótese de que
+municípios com alta competição política são mais propensos a adotar a
+Tarifa Zero foi confirmada. A política de Tarifa Zero é uma estratégia
+adotada por municípios que buscam se destacar politicamente,
+especialmente em um contexto de alta competição eleitoral.
+
+A análise e os resultados obtidos fornecem uma visão importante sobre os
+fatores que influenciam a implementação da Tarifa Zero e destacam a
+necessidade de considerar o contexto político local ao avaliar políticas
+públicas.
+
+\end{document}
